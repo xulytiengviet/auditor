@@ -1,835 +1,476 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>100x Agentic Engineer — Ship Like a 100-Person Team</title>
-<meta name="description" content="The autonomous development pipeline that turns a single developer into a 100-person engineering team. Built on Claude Code, Karpathy's context engineering, and NASA-grade quality gates.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#008080">
+<meta name="description" content="Auditor 100X: tài liệu và mô phỏng tiếng Việt của quy trình Agentic Engineer, chất lượng mã, bảo mật và DeepSeek đa tác tử, giao diện phong cách Visual FoxPro.">
+<meta property="og:title" content="AUDITOR 100X — Bàn điều khiển tiếng Việt">
+<meta property="og:description" content="Hướng dẫn kỹ thuật và mô phỏng tương tác với giao diện Visual FoxPro cổ điển.">
+<title>AUDITOR 100X | Trung tâm điều khiển FoxPro</title>
 <style>
-/* ============================================
-   RESET & FOUNDATION
-   ============================================ */
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#050508;
-  --surface:#0c0c14;
-  --surface2:#111119;
-  --surface3:#16161f;
-  --border:rgba(255,255,255,0.06);
-  --border2:rgba(255,255,255,0.1);
-  --text:#e8e8ed;
-  --text2:#8888a0;
-  --text3:#55556a;
-  --accent:#7c6cf0;
-  --accent2:#00d4aa;
-  --accent3:#f06292;
-  --accent4:#42a5f5;
-  --glow-purple:rgba(124,108,240,0.15);
-  --glow-green:rgba(0,212,170,0.15);
-  --glow-pink:rgba(240,98,146,0.12);
-  --gradient:linear-gradient(135deg,#7c6cf0 0%,#00d4aa 100%);
-  --gradient2:linear-gradient(135deg,#7c6cf0 0%,#f06292 100%);
-  --radius:16px;
-  --radius-sm:10px;
-  --radius-xs:6px;
-}
-html{scroll-behavior:smooth}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-a{color:var(--accent2);text-decoration:none;transition:opacity 0.2s}
-a:hover{opacity:0.8}
-::selection{background:rgba(124,108,240,0.3);color:#fff}
-
-/* ============================================
-   UTILITIES
-   ============================================ */
-.container{max-width:1140px;margin:0 auto;padding:0 2rem}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;font-size:0.75rem;font-weight:600;letter-spacing:0.03em;text-transform:uppercase}
-.badge--purple{background:var(--glow-purple);color:var(--accent)}
-.badge--green{background:var(--glow-green);color:var(--accent2)}
-.badge--pink{background:var(--glow-pink);color:var(--accent3)}
-.mono{font-family:'SF Mono','Fira Code','JetBrains Mono','Cascadia Code',monospace}
-
-/* ============================================
-   SECTION TITLES
-   ============================================ */
-.section{padding:7rem 0}
-.section--alt{background:var(--surface)}
-.section-label{font-size:0.8rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
-.section-title{font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.15;margin-bottom:1rem;letter-spacing:-0.02em}
-.section-title span{background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.section-desc{font-size:1.1rem;color:var(--text2);max-width:620px;line-height:1.7}
-
-/* ============================================
-   NAV
-   ============================================ */
-.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 0;transition:all 0.3s}
-.nav.scrolled{background:rgba(5,5,8,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav .container{display:flex;align-items:center;justify-content:space-between}
-.nav-logo{font-size:1.05rem;font-weight:800;letter-spacing:-0.02em}
-.nav-logo span{background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.nav-links{display:flex;gap:2rem;align-items:center}
-.nav-links a{color:var(--text2);font-size:0.85rem;font-weight:500;transition:color 0.2s}
-.nav-links a:hover{color:var(--text);opacity:1}
-.nav-cta{background:var(--gradient);color:#fff;padding:8px 20px;border-radius:100px;font-size:0.85rem;font-weight:600}
-.nav-cta:hover{opacity:0.9;transform:translateY(-1px)}
-
-/* ============================================
-   HERO
-   ============================================ */
-.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:6rem 0 4rem}
-.hero::before{content:'';position:absolute;top:-40%;left:-20%;width:140%;height:140%;background:
-  radial-gradient(ellipse 600px 400px at 25% 30%,rgba(124,108,240,0.12) 0%,transparent 70%),
-  radial-gradient(ellipse 500px 350px at 75% 50%,rgba(0,212,170,0.08) 0%,transparent 70%),
-  radial-gradient(ellipse 400px 300px at 50% 80%,rgba(240,98,146,0.06) 0%,transparent 70%);
-  animation:heroPulse 12s ease-in-out infinite alternate;pointer-events:none}
-@keyframes heroPulse{0%{opacity:0.6;transform:scale(1) rotate(0deg)}100%{opacity:1;transform:scale(1.05) rotate(1deg)}}
-
-.hero-grid{display:grid;grid-template-columns:1fr;gap:3rem;position:relative;z-index:1}
-.hero-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
-.hero h1{font-size:clamp(2.8rem,6.5vw,5.2rem);font-weight:800;line-height:1.05;letter-spacing:-0.03em;margin-bottom:1.5rem}
-.hero h1 .gradient{background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-sub{font-size:1.2rem;color:var(--text2);max-width:560px;line-height:1.7;margin-bottom:2.5rem}
-.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:100px;font-size:0.95rem;font-weight:600;transition:all 0.25s;cursor:pointer;border:none}
-.btn--primary{background:var(--gradient);color:#fff;box-shadow:0 4px 24px rgba(124,108,240,0.3)}
-.btn--primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(124,108,240,0.4);opacity:1}
-.btn--ghost{background:transparent;color:var(--text);border:1px solid var(--border2);backdrop-filter:blur(4px)}
-.btn--ghost:hover{border-color:var(--accent);color:var(--accent);opacity:1}
-
-/* ============================================
-   PROOF BAR
-   ============================================ */
-.proof-bar{padding:3rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.proof-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem}
-.proof-item{text-align:center;padding:0.5rem}
-.proof-num{font-size:2rem;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
-.proof-label{font-size:0.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px;font-weight:600}
-
-/* ============================================
-   PROBLEM → SOLUTION
-   ============================================ */
-.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem}
-.problem-card,.solution-card{padding:2rem;border-radius:var(--radius);position:relative;overflow:hidden}
-.problem-card{background:var(--surface);border:1px solid rgba(240,98,146,0.15)}
-.problem-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent3),transparent)}
-.solution-card{background:var(--surface);border:1px solid rgba(0,212,170,0.15)}
-.solution-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent2),transparent)}
-.problem-card h3,.solution-card h3{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.25rem}
-.problem-card h3{color:var(--accent3)}
-.solution-card h3{color:var(--accent2)}
-.problem-card ul,.solution-card ul{list-style:none;display:flex;flex-direction:column;gap:0.9rem}
-.problem-card li,.solution-card li{display:flex;gap:10px;font-size:0.92rem;color:var(--text2);line-height:1.5}
-.problem-card li::before{content:'';flex-shrink:0;width:6px;height:6px;border-radius:50%;margin-top:8px}
-.problem-card li::before{background:var(--accent3)}
-.solution-card li::before{content:'';flex-shrink:0;width:6px;height:6px;border-radius:50%;background:var(--accent2);margin-top:8px}
-
-/* ============================================
-   KEY INSIGHTS — BENTO GRID
-   ============================================ */
-.bento{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:3rem}
-.bento-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;position:relative;overflow:hidden;transition:all 0.35s cubic-bezier(0.4,0,0.2,1)}
-.bento-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.4)}
-.bento-card--wide{grid-column:span 2}
-.bento-card--tall{grid-row:span 2;display:flex;flex-direction:column}
-.bento-card--featured{border-color:rgba(124,108,240,0.2);background:linear-gradient(135deg,var(--surface) 0%,rgba(124,108,240,0.04) 100%)}
-
-.bento-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.25rem;position:relative}
-.bento-icon--purple{background:var(--glow-purple)}
-.bento-icon--green{background:var(--glow-green)}
-.bento-icon--pink{background:var(--glow-pink)}
-.bento-icon--blue{background:rgba(66,165,245,0.12)}
-
-.bento-card h3{font-size:1.15rem;font-weight:700;margin-bottom:0.6rem;letter-spacing:-0.01em}
-.bento-card p{font-size:0.9rem;color:var(--text2);line-height:1.65}
-
-.bento-metric{display:inline-flex;align-items:center;gap:6px;margin-top:1rem;padding:6px 12px;border-radius:var(--radius-xs);font-size:0.8rem;font-weight:700}
-.bento-metric--purple{background:var(--glow-purple);color:var(--accent)}
-.bento-metric--green{background:var(--glow-green);color:var(--accent2)}
-.bento-metric--pink{background:var(--glow-pink);color:var(--accent3)}
-.bento-metric--blue{background:rgba(66,165,245,0.12);color:var(--accent4)}
-
-.bento-evidence{margin-top:1rem;padding:0.85rem 1rem;background:rgba(0,0,0,0.25);border-radius:var(--radius-sm);border-left:3px solid var(--accent);font-size:0.82rem;color:var(--text2);line-height:1.55}
-
-/* Number highlight inside bento */
-.bento-big{font-size:3.5rem;font-weight:800;line-height:1;margin-bottom:0.5rem;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-
-/* ============================================
-   HOW IT WORKS — PIPELINE
-   ============================================ */
-.pipeline{display:flex;align-items:stretch;gap:0;margin-top:3rem;position:relative}
-.pipeline::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0.2;z-index:0}
-.pipe-step{flex:1;position:relative;z-index:1;text-align:center;padding:0 0.5rem}
-.pipe-dot{width:44px;height:44px;border-radius:50%;background:var(--surface2);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:0.85rem;font-weight:700;color:var(--accent);position:relative}
-.pipe-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;background:var(--glow-purple);opacity:0;transition:opacity 0.3s}
-.pipe-step:hover .pipe-dot::after{opacity:1}
-.pipe-step h4{font-size:0.95rem;font-weight:700;margin-bottom:0.35rem}
-.pipe-step p{font-size:0.78rem;color:var(--text3);line-height:1.45}
-.pipe-model{font-size:0.7rem;color:var(--accent);font-weight:600;margin-top:0.4rem;font-family:'SF Mono',monospace}
-
-/* ============================================
-   KARPATHY RULES
-   ============================================ */
-.rules-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-top:3rem}
-.rule{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;position:relative;transition:border-color 0.3s}
-.rule:hover{border-color:rgba(124,108,240,0.25)}
-.rule-number{position:absolute;top:1.5rem;right:1.75rem;font-size:4rem;font-weight:900;line-height:1;background:linear-gradient(180deg,rgba(124,108,240,0.08),transparent);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.rule h4{font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;color:var(--accent);letter-spacing:-0.01em}
-.rule p{font-size:0.88rem;color:var(--text2);line-height:1.6;max-width:90%}
-.rule blockquote{margin-top:0.75rem;padding-left:1rem;border-left:2px solid var(--border2);font-size:0.82rem;color:var(--text3);font-style:italic}
-
-/* ============================================
-   COST TABLE
-   ============================================ */
-.cost-wrap{margin-top:3rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.cost-table{width:100%;border-collapse:collapse;font-size:0.9rem}
-.cost-table thead{background:var(--surface2)}
-.cost-table th{padding:1rem 1.25rem;text-align:left;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);font-weight:700;border-bottom:1px solid var(--border)}
-.cost-table td{padding:0.9rem 1.25rem;border-bottom:1px solid var(--border)}
-.cost-table tbody tr{transition:background 0.2s}
-.cost-table tbody tr:hover{background:rgba(124,108,240,0.03)}
-.cost-table tbody tr:last-child td{border-bottom:none}
-.cost-green{color:var(--accent2);font-weight:700}
-.cost-savings{display:inline-block;background:var(--glow-green);color:var(--accent2);padding:3px 10px;border-radius:100px;font-size:0.75rem;font-weight:700}
-.cost-promo{display:inline-block;background:var(--glow-pink);color:var(--accent3);padding:3px 10px;border-radius:100px;font-size:0.7rem;font-weight:700}
-
-/* ============================================
-   ARCHITECTURE
-   ============================================ */
-.arch{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2.5rem;margin-top:3rem;overflow-x:auto}
-.arch pre{font-family:'SF Mono','Fira Code','JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent2);line-height:1.6;white-space:pre}
-
-/* ============================================
-   ONBOARDING
-   ============================================ */
-.steps{margin-top:3rem;display:flex;flex-direction:column;gap:1.5rem}
-.step{display:grid;grid-template-columns:56px 1fr;gap:1.5rem;align-items:start}
-.step-num{width:56px;height:56px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:var(--accent);flex-shrink:0;position:relative}
-.step-num::after{content:'';position:absolute;bottom:-1.5rem;left:50%;width:1px;height:1.5rem;background:var(--border)}
-.step:last-child .step-num::after{display:none}
-.step-content h4{font-size:1rem;font-weight:700;margin-bottom:0.3rem}
-.step-content p{font-size:0.88rem;color:var(--text2);margin-bottom:0.6rem}
-.step-code{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.85rem 1rem;font-family:'SF Mono','Fira Code',monospace;font-size:0.8rem;color:var(--accent2);overflow-x:auto;line-height:1.5}
-
-/* ============================================
-   QUOTE
-   ============================================ */
-.quote-block{margin-top:3rem;padding:2.5rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);position:relative}
-.quote-block::before{content:'"';position:absolute;top:0.5rem;left:1.5rem;font-size:5rem;font-weight:800;color:rgba(124,108,240,0.1);line-height:1;font-family:Georgia,serif}
-.quote-block blockquote{font-size:1.15rem;line-height:1.7;color:var(--text);font-style:italic;padding-left:0.5rem;max-width:90%}
-.quote-block cite{display:block;margin-top:1rem;font-size:0.85rem;color:var(--text3);font-style:normal;font-weight:600}
-
-/* ============================================
-   FORMULA
-   ============================================ */
-.formula-box{background:var(--surface);border:1px solid rgba(124,108,240,0.15);border-radius:var(--radius);padding:2.5rem 3rem;margin-top:3rem;text-align:center}
-.formula-code{font-family:'SF Mono','Fira Code',monospace;font-size:clamp(0.85rem,1.5vw,1.05rem);line-height:2.2;text-align:left;display:inline-block}
-.formula-code .var{color:var(--accent);font-weight:700}
-.formula-code .op{color:var(--text3)}
-.formula-code .comment{color:var(--text3);font-size:0.85em}
-
-/* ============================================
-   FOOTER
-   ============================================ */
-.footer{padding:4rem 0 3rem;border-top:1px solid var(--border);text-align:center}
-.footer-tagline{font-size:1.1rem;color:var(--text2);font-style:italic;margin-bottom:0.75rem}
-.footer-links{display:flex;gap:2rem;justify-content:center;margin-top:1.5rem;flex-wrap:wrap}
-.footer-links a{color:var(--text3);font-size:0.85rem;font-weight:500}
-.footer-links a:hover{color:var(--accent2)}
-.footer-copy{margin-top:2rem;font-size:0.75rem;color:var(--text3)}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-@media(max-width:900px){
-  .bento{grid-template-columns:1fr}
-  .bento-card--wide,.bento-card--tall{grid-column:span 1;grid-row:span 1}
-  .problem-grid{grid-template-columns:1fr}
-  .rules-grid{grid-template-columns:1fr}
-  .proof-grid{grid-template-columns:repeat(3,1fr)}
-  .proof-grid .proof-item:nth-child(4),.proof-grid .proof-item:nth-child(5){grid-column:auto}
-  .pipeline{flex-direction:column;gap:0.5rem}
-  .pipeline::before{display:none}
-  .nav-links{display:none}
-}
-@media(max-width:600px){
-  .proof-grid{grid-template-columns:repeat(2,1fr)}
-  .hero h1{font-size:2.4rem}
-  .section{padding:4rem 0}
-  .step{grid-template-columns:1fr}
-  .step-num{width:40px;height:40px;font-size:0.9rem}
-  .step-num::after{display:none}
-}
-
-/* ============================================
-   ANIMATIONS (intersection observer)
-   ============================================ */
-.reveal{opacity:0;transform:translateY(30px);transition:all 0.7s cubic-bezier(0.4,0,0.2,1)}
-.reveal.visible{opacity:1;transform:translateY(0)}
-.reveal-delay-1{transition-delay:0.1s}
-.reveal-delay-2{transition-delay:0.2s}
-.reveal-delay-3{transition-delay:0.3s}
-.reveal-delay-4{transition-delay:0.4s}
+:root{--navy:#001778;--navy2:#000080;--teal:#008080;--chrome:#c0c0c0;--paper:#fff;--ink:#161616;--line:#808080;--green:#006b31;--shadow:#404040;--soft:#dfdfdf;--yellow:#ffffdc;--red:#9d2525}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}html{scroll-behavior:smooth}
+body{font:13px/1.45 Tahoma,"MS Sans Serif","Segoe UI",Arial,sans-serif;background:var(--teal);color:var(--ink)}
+button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px dotted #fbbf24;outline-offset:2px}a{color:#001c9d}
+.screen{min-height:100vh;padding:18px 22px 32px;background:radial-gradient(circle at 85% 88%,#087b79 0%,#008080 45%,#006e70 100%)}
+.shell{max-width:1520px;margin:auto;background:var(--chrome);border:2px solid;border-color:#fff #3f3f3f #3f3f3f #fff;box-shadow:2px 2px 0 #000,10px 14px 0 #002f34;min-height:calc(100vh - 56px);display:flex;flex-direction:column}
+.titlebar{min-height:35px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#fff;background:linear-gradient(90deg,#000080 0%,#0c3590 70%,#7298c8 100%);padding:5px 7px;font-size:14px;font-weight:bold}
+.title-main{display:flex;align-items:center;gap:9px;min-width:0}.title-main strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brandmark{display:grid;place-items:center;width:23px;height:23px;background:#c9c9c9;color:#00185e;box-shadow:inset 1px 1px white,inset -1px -1px #555;font-size:15px}
+.win-controls{display:flex;gap:4px}.win-controls span{width:23px;height:21px;display:grid;place-items:center;background:#c0c0c0;color:#000;border:2px solid;border-color:#fff #4d4d4d #4d4d4d #fff;line-height:1}
+.menu{display:flex;align-items:center;gap:2px;flex-wrap:wrap;padding:3px 9px;border-bottom:1px solid #777}
+.menu button{border:1px solid transparent;padding:4px 13px;background:transparent;text-align:left}.menu button:hover,.menu button:focus-visible{border-color:#fff #666 #666 #fff;background:#d2d2d2}
+.toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:7px 10px;border-top:1px solid #fff;border-bottom:1px solid #777;min-height:49px}
+.tool,.retro-btn{background:var(--chrome);color:#111;border:2px solid;border-color:#fff #555 #555 #fff;box-shadow:1px 1px 0 #222;min-height:31px;padding:5px 12px;display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;font-weight:600}
+.tool:hover,.retro-btn:hover{background:#dedede}.tool:active,.retro-btn:active{border-color:#555 #fff #fff #555;transform:translate(1px,1px);box-shadow:none}
+.tool .glyph{font-family:Consolas,monospace;font-size:16px;color:#001f8e}.tool.primary{background:#e7edff}
+.toolbar-split{border-left:1px solid #777;border-right:1px solid white;height:26px;margin:0 4px}
+.toolbar-right{margin-left:auto;color:#464646;font:12px Consolas,monospace}
+.workspace{display:grid;grid-template-columns:226px minmax(0,1fr) 234px;gap:10px;padding:10px;flex:1;min-height:0}
+.pane{border:2px solid;border-color:#808080 #fff #fff #808080;background:#f7f7f7;min-width:0}
+.pane-head{padding:7px 9px;color:#fff;font-size:12px;font-weight:bold;background:#656565;display:flex;gap:8px;align-items:center;justify-content:space-between}
+.explorer{display:flex;flex-direction:column;overflow:hidden}
+.tree-caption{background:#e1e1e1;padding:8px 11px;color:#444;border-bottom:1px solid #a2a2a2;font-size:11px;letter-spacing:.05em}
+.tree{padding:9px 7px;display:flex;flex-direction:column;gap:3px}
+.tree-label{margin:7px 8px 4px;font-weight:bold;font-size:11px;color:#515151;text-transform:uppercase;letter-spacing:.06em}
+.nav-item{border:1px solid transparent;background:transparent;text-align:left;display:flex;align-items:center;gap:9px;padding:9px 8px;width:100%;color:#202020}
+.nav-item:hover{background:#e2e8f9;border-color:#adc0e8}
+.nav-item.active{background:var(--navy2);color:#fff;border-color:#000}
+.foldericon{font:16px Consolas,monospace;width:18px;text-align:center;color:#a17012}.nav-item.active .foldericon{color:#fff}
+.explorer-tip{margin:auto 10px 12px;padding:11px;background:#ffffe5;border:1px solid #aaa;font-size:12px;color:#383838}
+.explorer-tip b{display:block;margin-bottom:6px}
+.main-column{min-width:0;display:flex;flex-direction:column;gap:10px}
+.sub-window{background:var(--chrome);border:2px solid;border-color:#fff #555 #555 #fff;box-shadow:2px 3px 0 #7b7b7b;overflow:hidden}
+.sub-title{background:linear-gradient(90deg,#000080,#4269ae);color:white;font-size:12px;font-weight:bold;display:flex;align-items:center;justify-content:space-between;padding:6px 9px;gap:10px}
+.sub-title span:last-child{display:flex;gap:3px}.sub-title i{font:11px Consolas,monospace;display:grid;place-items:center;background:#c0c0c0;color:#000;width:17px;height:16px;border:1px solid white;font-style:normal}
+.tab-strip{display:flex;gap:3px;overflow-x:auto;scrollbar-width:thin;padding:7px 8px 0}
+.tab{flex-shrink:0;border:2px solid;border-color:#fff #666 #666 #fff;background:#b1b1b1;padding:6px 13px;font-size:12px;white-space:nowrap}
+.tab[aria-selected="true"]{background:#f9f9f9;border-bottom-color:#f9f9f;font-weight:bold;color:#000080}
+.page-wrap{background:#f9f9f9;margin:0 8px 8px;border:2px solid;border-color:#777 #fff #fff #777;min-height:560px}
+.page{display:none;padding:23px 25px 29px;animation:appear .16s ease}.page.active{display:block}@keyframes appear{from{opacity:.6}to{opacity:1}}
+.overline{font:11px/1.5 Consolas,monospace;letter-spacing:.07em;color:#4c4c4c;margin-bottom:8px}
+h1,h2,h3,p{margin-top:0}h1{font-size:clamp(26px,3vw,39px);line-height:1.12;letter-spacing:-.025em;margin-bottom:14px;color:#001860}h2{font-size:21px;color:#001860;line-height:1.28;margin-bottom:11px}h3{font-size:15px;color:#001860;margin-bottom:8px}
+.lead{font-size:14px;line-height:1.72;color:#313131;max-width:760px}.muted{color:#555}.tiny{font-size:11px}
+.hero-panel{position:relative;padding:22px 22px 16px;border:1px solid #808080;background:linear-gradient(135deg,#fbfbfb 0%,#f4f7ff 65%,#e2edff 100%);box-shadow:inset 1px 1px white}
+.hero-panel:after{content:"100X";font:bold 72px Consolas,monospace;position:absolute;right:14px;top:8px;color:#e1e8f6;pointer-events:none}.hero-panel>*{position:relative;z-index:1}
+.kicker{display:inline-flex;gap:9px;align-items:center;background:#001b76;color:#fff;padding:5px 9px;font:11px Consolas,monospace;margin-bottom:15px}
+.action-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:17px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:15px 0}
+.tile{border:2px solid;border-color:#fff #777 #777 #fff;background:#e4e4e4;padding:13px 12px;min-height:88px}
+.tile b{display:block;font:700 28px/1.12 Consolas,monospace;color:#000080;margin-bottom:6px}.tile span{font-size:11px;color:#454545}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.stack{display:flex;flex-direction:column;gap:12px}
+.group{background:#efefef;border:1px solid #aaa;padding:15px 15px 11px;box-shadow:inset 1px 1px white}
+.group legend{color:#001e76;font-weight:bold}
+hr{border:0;border-top:1px solid #aaa;border-bottom:1px solid white;margin:19px 0}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}.section-head h2{margin:0}
+.featurelist{padding-left:19px;margin:5px 0 2px}.featurelist li{margin:7px 0}
+.notice{padding:10px 13px;border-left:4px solid #977700;background:#fff9d4;color:#4c4100;font-size:12px;margin:13px 0;line-height:1.6}
+.notice.info{border-color:#1d5790;background:#eaf4ff;color:#17314c}
+.notice.good{border-color:#168048;background:#eaf9ed;color:#175232}
+.flowline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:17px 0}
+.flow-step{background:#ebebeb;border:2px solid;border-color:white #7b7b7b #7b7b7b white;padding:12px 9px;min-height:140px;transition:background .15s}
+.flow-step strong{display:flex;justify-content:space-between;gap:4px;color:#00186d;align-items:center}
+.flow-step small{display:block;color:#555;margin-top:9px;line-height:1.52;font-size:11px}.flow-step.done{background:#dff0e3;border-color:#fff #468a5d #468a5d #fff}.flow-step.current{background:#fff3b6;border-color:#fff #aa7900 #aa7900 #fff}
+.flow-num{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;background:#001c76;color:white;border:1px solid #fff;font:700 12px Consolas,monospace}
+.progress-rail{height:18px;border:2px solid;border-color:#666 #fff #fff #666;background:#fff;padding:2px;margin:8px 0}.progress-fill{height:100%;width:0;background:repeating-linear-gradient(90deg,#000080 0 13px,#204dbe 13px 16px);transition:width .3s}
+.datagrid{border:2px solid;border-color:#777 #fff #fff #777;background:#fff;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:460px}
+th{background:#c0c0c0;border:1px solid;border-color:#fff #808080 #808080 #fff;text-align:left;color:#111;padding:8px 9px;white-space:nowrap}
+td{border:1px solid #ddd;padding:8px 9px;vertical-align:top}
+tbody tr:nth-child(even){background:#f1f5fc}tbody tr:hover{background:#f9f5d8}
+.rowtag{font:700 10px Consolas,monospace;display:inline-block;padding:3px 7px;border:1px solid #888;background:#f0f0f0}
+.rowtag.green{background:#e4f4e3;color:#17652a;border-color:#8ac295}.rowtag.yellow{background:#fff0cc;color:#7d4800;border-color:#d8b45a}
+.console{background:#051a20;border:2px solid;border-color:#555 #fff #fff #555;color:#b2ffbe;font:12px/1.7 Consolas,"Courier New",monospace;min-height:164px;max-height:260px;overflow:auto;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.console .prompt{color:#f8e57b}.console .dim{color:#8dabb2}
+.cmd-card{background:#e8e8e8;border:1px solid #999;padding:10px 11px;margin:11px 0}.cmd-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.cmd-head strong{font-size:12px;color:#001b73}
+.cmd-line{white-space:pre-wrap;overflow-wrap:anywhere;background:#0a1c21;color:#b5ffbb;padding:11px 12px;margin:0;font:12px/1.6 Consolas,monospace;user-select:text}
+.copy-btn{background:#ddd;border:2px solid;border-color:#fff #666 #666 #fff;padding:4px 8px;white-space:nowrap}
+.formrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.formrow select,.formrow input{background:#fff;border:2px inset #aaa;padding:6px 9px;min-width:150px}
+kbd{display:inline-block;background:#eee;border:1px solid #888;padding:0 5px;box-shadow:1px 1px #aaa;font:11px Consolas,monospace}
+.rightbar{display:flex;flex-direction:column;gap:10px;min-width:0}
+.inspector-content{padding:11px 10px}
+.metric{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px dotted #aaa}
+.metric span{font-size:11px;color:#4b4b4b}.metric strong{font:700 12px Consolas,monospace;color:#001f76;text-align:right}
+.light{width:9px;height:9px;display:inline-block;vertical-align:middle;margin-right:5px;border-radius:50%;background:#128847;box-shadow:0 0 0 1px #325b3d}
+.inspector-box{padding:10px;background:var(--yellow);border:1px solid #b4b49a;font-size:11px;line-height:1.65;margin-top:12px}
+.key-row{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #ddd;padding:8px 0;font-size:11px}
+.statusbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:var(--chrome);border-top:1px solid #777;box-shadow:inset 0 1px #fff;padding:5px 8px;font:11px Consolas,monospace;color:#313131}
+.statusbar>span{border:1px solid;border-color:#888 #fff #fff #888;padding:3px 8px}
+.linkgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.doclink{display:flex;align-items:center;justify-content:space-between;background:#efefef;padding:13px;border:1px solid #aaa;text-decoration:none;min-height:58px;font-weight:bold}.doclink:hover{background:#d9e6ff}
+.footer-note{font-size:11px;line-height:1.7;color:#414141;margin-top:17px}
+.searchbox{width:100%;padding:9px;border:2px inset #aaa;background:#fff}
+.search-results{margin-top:12px;display:grid;gap:6px}.search-hit{background:#e8edf9;border:1px solid #a5b5da;padding:10px;text-align:left}.search-hit:hover{background:#d3e2ff}
+.aside-hidden{display:none}
+@media(max-width:1150px){.workspace{grid-template-columns:194px minmax(0,1fr)}.rightbar{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.rightbar .pane:last-child{min-height:100%}.tiles{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.screen{padding:6px}.shell{min-height:calc(100vh - 12px);box-shadow:2px 2px #00494b}.workspace{grid-template-columns:1fr;padding:7px;gap:7px}.explorer{display:none}.explorer.show-mobile{display:flex}.rightbar{grid-template-columns:1fr}.toolbar-right{display:none}.page{padding:14px}.page-wrap{min-height:510px}.flowline{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2,.linkgrid{grid-template-columns:1fr}.hero-panel:after{font-size:42px}.titlebar{font-size:12px}.title-main strong{white-space:normal}.menu{gap:0}.menu button{padding:4px 9px}}
+@media(max-width:440px){.tiles{grid-template-columns:repeat(2,1fr)}.flowline{grid-template-columns:1fr}.flow-step{min-height:86px}.tool{padding:5px 8px}.statusbar{font-size:10px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{.screen{padding:0;background:#fff}.shell{box-shadow:none}.menu,.toolbar,.explorer,.rightbar,.tab-strip,.statusbar,.action-row{display:none!important}.workspace{display:block}.page{display:block!important;break-after:page}.page-wrap,.sub-window{border:none;box-shadow:none}.sub-title{color:#000;background:#fff}}
 </style>
 </head>
 <body>
-
-<!-- NAV -->
-<nav class="nav" id="nav">
-  <div class="container">
-    <div class="nav-logo"><span>100x</span> Agentic</div>
-    <div class="nav-links">
-      <a href="#insights">Insights</a>
-      <a href="#pipeline">Pipeline</a>
-      <a href="#costs">Costs</a>
-      <a href="#start">Get Started</a>
-      <a href="https://github.com/theluckystrike/100xagenticdev" class="nav-cta">GitHub</a>
-    </div>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="container">
-    <div class="hero-grid">
-      <div>
-        <div class="hero-eyebrow">
-          <span class="badge badge--purple">Open Source</span>
-          <span class="badge badge--green">Production Ready</span>
-        </div>
-        <h1>One developer.<br><span class="gradient">100-person output.</span></h1>
-        <p class="hero-sub">The autonomous engineering pipeline built on Karpathy's context engineering, Claude Code, NASA-grade quality gates, and cost-optimized model routing. Every script copy-paste ready. Every claim sourced.</p>
-        <div class="hero-actions">
-          <a href="#start" class="btn btn--primary">Get Started in 15 min</a>
-          <a href="#insights" class="btn btn--ghost">See Key Insights</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PROOF BAR -->
-<div class="proof-bar">
-  <div class="container">
-    <div class="proof-grid">
-      <div class="proof-item">
-        <div class="proof-num">6-10x</div>
-        <div class="proof-label">Harness Multiplier</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-num">85%</div>
-        <div class="proof-label">Cost Reduction</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-num">90%</div>
-        <div class="proof-label">Cache Savings</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-num">7-Stage</div>
-        <div class="proof-label">Quality Gate</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-num">$0</div>
-        <div class="proof-label">Runaway Costs</div>
-      </div>
-    </div>
-  </div>
+<div class="screen">
+<div class="shell" id="app">
+<header>
+<div class="titlebar">
+  <div class="title-main"><span class="brandmark" aria-hidden="true">▣</span><strong>AUDITOR 100X — TRUNG TÂM ĐIỀU KHIỂN TÁC TỬ [VI.EXE]</strong></div>
+  <div class="win-controls" aria-hidden="true"><span>_</span><span>□</span><span>×</span></div>
 </div>
-
-<!-- PROBLEM / SOLUTION -->
-<section class="section">
-  <div class="container">
-    <div class="section-label">The Shift</div>
-    <h2 class="section-title">The bottleneck moved from <span>generation to verification</span></h2>
-    <p class="section-desc">AI agents produce at incredible speed. Knowing whether output is correct is the hard part. That's where the 100x engineer lives.</p>
-    <div class="problem-grid reveal">
-      <div class="problem-card">
-        <h3>Without This Pipeline</h3>
-        <ul>
-          <li>Agents hallucinate, you manually review every line</li>
-          <li>$47K surprise bills from runaway agent loops</li>
-          <li>Every session starts from zero — no memory</li>
-          <li>One model for everything — overpaying by 85%</li>
-          <li>No quality enforcement — bugs ship to production</li>
-          <li>"Vibe coding" — high floor, low ceiling</li>
-        </ul>
-      </div>
-      <div class="solution-card">
-        <h3>With This Pipeline</h3>
-        <ul>
-          <li>7-stage quality gate catches issues before you see them</li>
-          <li>5-layer budget system — agents literally cannot overspend</li>
-          <li>Compounding memory — knowledge grows every session</li>
-          <li>Smart routing: $0.28/M for simple, frontier for complex</li>
-          <li>NASA Power of 10 rules enforced by linters and hooks</li>
-          <li>Agentic engineering — high floor AND high ceiling</li>
-        </ul>
+<nav class="menu" aria-label="Menu ứng dụng">
+  <button data-nav="home"><u>T</u>ệp</button><button data-nav="pipeline"><u>Q</u>uy trình</button><button data-nav="quality"><u>K</u>iểm soát</button><button data-nav="agents"><u>T</u>ác tử</button><button data-nav="install"><u>C</u>ông cụ</button><button data-nav="docs"><u>T</u>rợ giúp</button>
+</nav>
+<div class="toolbar" aria-label="Thanh công cụ">
+  <button class="tool primary" data-nav="home"><span class="glyph">▣</span> Tổng quan</button>
+  <button class="tool" data-nav="pipeline"><span class="glyph">▷</span> Quy trình</button>
+  <button class="tool" id="toolbarDemo"><span class="glyph">▶</span> Chạy mô phỏng</button>
+  <span class="toolbar-split"></span>
+  <button class="tool" data-nav="install"><span class="glyph">⌘</span> Lệnh cài đặt</button>
+  <button class="tool" id="exportBtn"><span class="glyph">▤</span> Xuất nhật ký</button>
+  <button class="tool" data-nav="docs"><span class="glyph">?</span> Trợ giúp</button>
+  <button class="tool" id="toggleExplorer" aria-controls="explorer" aria-expanded="false">≡ Danh mục</button>
+  <span class="toolbar-right">VISUAL FOXPRO INSPIRED · WEB EDITION 1.0</span>
+</div>
+</header>
+<div class="workspace">
+<aside class="explorer pane" id="explorer" aria-label="Cây điều hướng">
+<div class="pane-head">▥ PROJECT MANAGER <span>×</span></div>
+<div class="tree-caption">auditor.pjx / Tiếng Việt</div>
+<div class="tree">
+<div class="tree-label">HỒ SƠ DỰ ÁN</div>
+<button class="nav-item active" data-nav="home"><span class="foldericon">▣</span> Giới thiệu chung</button>
+<button class="nav-item" data-nav="pipeline"><span class="foldericon">▤</span> Quy trình 4 giai đoạn</button>
+<button class="nav-item" data-nav="quality"><span class="foldericon">▦</span> Cổng chất lượng</button>
+<div class="tree-label">VẬN HÀNH</div>
+<button class="nav-item" data-nav="agents"><span class="foldericon">▥</span> Tác tử DeepSeek</button>
+<button class="nav-item" data-nav="install"><span class="foldericon">▧</span> Cài đặt &amp; lệnh</button>
+<button class="nav-item" data-nav="docs"><span class="foldericon">▨</span> Tài liệu &amp; nguồn</button>
+</div>
+<div class="explorer-tip"><b>HƯỚNG DẪN NHANH</b>Chọn một thư mục để xem diễn giải tiếng Việt. Nhấn <kbd>F5</kbd> để chạy thử quy trình minh họa, <kbd>F1</kbd> để mở trợ giúp.</div>
+</aside>
+<main class="main-column">
+<section class="sub-window" aria-label="Cửa sổ tài liệu chính">
+  <div class="sub-title"><span>▣ AUDITOR_DOCS.DBF — Chế độ đọc và mô phỏng</span><span aria-hidden="true"><i>_</i><i>□</i><i>×</i></span></div>
+  <div class="tab-strip" role="tablist" aria-label="Chọn trang">
+    <button class="tab" role="tab" aria-selected="true" data-nav="home">Tổng quan</button>
+    <button class="tab" role="tab" aria-selected="false" data-nav="pipeline">Quy trình</button>
+    <button class="tab" role="tab" aria-selected="false" data-nav="quality">Chất lượng</button>
+    <button class="tab" role="tab" aria-selected="false" data-nav="agents">Đa tác tử</button>
+    <button class="tab" role="tab" aria-selected="false" data-nav="install">Cài đặt</button>
+    <button class="tab" role="tab" aria-selected="false" data-nav="docs">Tài liệu</button>
+  </div>
+  <div class="page-wrap">
+  <article class="page active" id="view-home" data-page="home">
+    <div class="hero-panel">
+      <div class="kicker">AUDITOR.EXE <span>▸</span> HỒ SƠ KỸ THUẬT · BẢN TIẾNG VIỆT</div>
+      <h1>Kiểm soát chất lượng<br>phát triển phần mềm bằng AI.</h1>
+      <p class="lead">Auditor 100X là giao diện tìm hiểu bộ <strong>100x Agentic Engineer Pipeline</strong>: kết hợp quy trình phát triển bốn giai đoạn, kiểm tra chất lượng, quản lý chi phí và điều phối tác tử AI. Trang này giải thích mã nguồn theo cách trực quan, giữ tinh thần làm việc của <strong>Visual FoxPro</strong> trên trình duyệt.</p>
+      <div class="action-row">
+        <button class="retro-btn" data-nav="pipeline">▶ Khám phá quy trình</button>
+        <button class="retro-btn" data-nav="install">⌘ Hướng dẫn chạy thật</button>
+        <a class="retro-btn" href="https://github.com/xulytiengviet/auditor" target="_blank" rel="noopener noreferrer">↗ Xem mã GitHub</a>
       </div>
     </div>
+    <div class="tiles" aria-label="Thông số kiến trúc">
+      <div class="tile"><b>04</b><span>Giai đoạn trong luồng 100x</span></div>
+      <div class="tile"><b>09</b><span>Mẫu tác vụ DeepSeek được mô tả</span></div>
+      <div class="tile"><b>CLI</b><span>Điều khiển từ dòng lệnh</span></div>
+      <div class="tile"><b>MIT</b><span>Giấy phép nguồn mở</span></div>
+    </div>
+    <div class="grid2">
+      <fieldset class="group"><legend> Auditor hoạt động như thế nào?</legend><ul class="featurelist">
+        <li><strong>Phân tích:</strong> đọc yêu cầu, xây dựng phạm vi, nhận diện rủi ro.</li>
+        <li><strong>Triển khai:</strong> viết hoặc chỉnh sửa mã theo kế hoạch.</li>
+        <li><strong>Kiểm thử:</strong> chạy kiểm tra phù hợp với ngôn ngữ dự án.</li>
+        <li><strong>Rà soát:</strong> đánh giá bảo mật, chất lượng và quy tắc mã.</li>
+      </ul></fieldset>
+      <fieldset class="group"><legend> Phân biệt hai chế độ vận hành</legend><ul class="featurelist">
+        <li><strong>100x CLI:</strong> quy trình phát triển mã dựa trên Claude Code và công cụ shell.</li>
+        <li><strong>DeepSeek Pipeline:</strong> luồng nghiên cứu đa tác tử qua Python và API.</li>
+        <li><strong>Trang web này:</strong> hướng dẫn + mô phỏng cục bộ, không gọi API và không quét repository.</li>
+      </ul></fieldset>
+    </div>
+    <div class="notice info"><strong>Phạm vi:</strong> Auditor trong repository này là bộ công cụ quy trình kỹ thuật phần mềm, không phải dịch vụ quét lỗ hổng website trực tiếp. Các số liệu hiệu quả trong tài liệu nghiên cứu là tham chiếu, không phải cam kết kết quả cho mọi dự án.</div>
+  </article>
+
+  <article class="page" id="view-pipeline" data-page="pipeline" hidden>
+    <div class="overline">MODULE: PIPELINE.PRG / WORKFLOW VIEW</div>
+    <h2>Quy trình 4 giai đoạn</h2>
+    <p class="lead">Một yêu cầu được xử lý qua bốn bước: <strong>Analyze → Implement → Test → Review</strong>. Nhấn “Chạy mô phỏng” để xem thứ tự xử lý. Trình duyệt chỉ hiển thị log mẫu và không thực thi tác tử thật.</p>
+    <div class="flowline" id="flow">
+      <div class="flow-step" data-stage="0"><strong><span><span class="flow-num">01</span> PHÂN TÍCH</span></strong><small>Đọc mã, khoanh vùng công việc, viết kế hoạch và đánh giá rủi ro.</small></div>
+      <div class="flow-step" data-stage="1"><strong><span><span class="flow-num">02</span> TRIỂN KHAI</span></strong><small>Thay đổi mã theo kế hoạch; tự kiểm tra từng phần đã sửa.</small></div>
+      <div class="flow-step" data-stage="2"><strong><span><span class="flow-num">03</span> KIỂM THỬ</span></strong><small>Chạy quality gates tương ứng với stack công nghệ.</small></div>
+      <div class="flow-step" data-stage="3"><strong><span><span class="flow-num">04</span> RÀ SOÁT</span></strong><small>Đối chiếu bảo mật, quy tắc NASA P10 và điều kiện hoàn tất.</small></div>
+    </div>
+    <div class="formrow"><button class="retro-btn" id="runDemo">▶ Chạy mô phỏng</button><button class="retro-btn" id="resetDemo">■ Đặt lại</button><span id="demoState" role="status">Sẵn sàng · Chưa chạy</span></div>
+    <div class="progress-rail" role="progressbar" aria-label="Tiến độ mô phỏng" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="console" id="demoConsole" aria-live="polite"><span class="prompt">C:\AUDITOR&gt;</span> Chờ lệnh RUN DEMO
+<span class="dim">* Đây là console mô phỏng, không phải kết quả kiểm tra thực tế.</span></div>
+    <div class="notice">Mô phỏng giả lập luồng quy trình bằng JavaScript tại trình duyệt. Muốn chạy tác vụ thật, dùng lệnh <strong>100x run</strong> trong môi trường CLI đã cài đặt.</div>
+    <div class="cmd-card"><div class="cmd-head"><strong>LỆNH THỰC THI TRONG CLI</strong><button class="copy-btn">Sao chép</button></div><pre class="cmd-line"><code>100x run "Add input validation to all API endpoints"</code></pre></div>
+    <h3>Các thành phần bao quanh quy trình</h3><p>Harness dùng quy tắc dự án, context và hướng dẫn theo từng giai đoạn. Quality gate kiểm tra mã; budget hạn chế chi phí và rủi ro vòng lặp. Kết quả thực phụ thuộc công cụ, model, cấu hình và thử nghiệm của từng dự án.</p>
+  </article>
+
+  <article class="page" id="view-quality" data-page="quality" hidden>
+    <div class="overline">MODULE: QUALITY_GATE.PRG / RULE INSPECTOR</div>
+    <h2>Cổng chất lượng &amp; kiểm tra bảo mật</h2>
+    <p class="lead">Lệnh <strong>100x gate</strong> nhận diện loại dự án và chạy chuỗi kiểm tra phù hợp. Bảng dưới đây tóm tắt nhóm kiểm tra được README mô tả, không phản ánh việc đã chạy kiểm thử trên thiết bị hiện tại.</p>
+    <div class="datagrid"><table>
+      <thead><tr><th>Loại dự án</th><th>Các bước kiểm tra được mô tả</th><th>Ý nghĩa</th></tr></thead>
+      <tbody>
+        <tr><td><b>JavaScript / TypeScript</b></td><td>Prettier → ESLint → tsc → Vitest → Semgrep → Gitleaks → npm audit</td><td>Định dạng, kiểu dữ liệu, test và rà soát phụ thuộc/bí mật</td></tr>
+        <tr><td><b>Rust</b></td><td>cargo fmt → clippy → test → audit → Gitleaks</td><td>Phong cách mã, lint, unit test và kiểm tra phụ thuộc</td></tr>
+        <tr><td><b>Go</b></td><td>gofmt → go vet → test → govulncheck → Gitleaks</td><td>Phân tích tĩnh, test và phụ thuộc dễ bị tấn công</td></tr>
+        <tr><td><b>Python</b></td><td>ruff → mypy → pytest → Semgrep → Gitleaks</td><td>Lint, kiểm tra kiểu, test và rà quét mã</td></tr>
+      </tbody>
+    </table></div>
+    <div class="grid2" style="margin-top:15px">
+      <fieldset class="group"><legend> Quy tắc chất lượng</legend><ul class="featurelist"><li>Kiểm soát lỗi sớm và ghi rõ bằng chứng.</li><li>Tránh vòng lặp không giới hạn, thay đổi mã thiếu kiểm chứng.</li><li>Ưu tiên kiểm thử tự động và đánh giá có thể lặp lại.</li><li>Thất bại ở gate cần được sửa, không xem là đã đạt.</li></ul></fieldset>
+      <fieldset class="group"><legend> Kiểm toán không đồng nghĩa bảo đảm an toàn</legend><ul class="featurelist"><li>Không chạy quét thật từ GitHub Pages.</li><li>Không đánh giá mục tiêu mạng ngoài phạm vi được phép.</li><li>Rà soát tự động không thay thế kiểm thử chuyên gia.</li><li>Cần giữ kết quả, phiên bản công cụ và thời điểm chạy.</li></ul></fieldset>
+    </div>
+    <div class="cmd-card"><div class="cmd-head"><strong>CHẠY QUALITY GATES</strong><button class="copy-btn">Sao chép</button></div><pre class="cmd-line"><code>100x gate</code></pre></div>
+    <div class="notice info">Danh sách trên phản ánh mô tả trong README; một bước chỉ chạy được nếu môi trường đã cài và dự án có cấu hình tương ứng. Hãy kiểm tra log của CLI trước khi kết luận PASS.</div>
+  </article>
+
+  <article class="page" id="view-agents" data-page="agents" hidden>
+    <div class="overline">MODULE: AGENTS.DBF / MULTI-AGENT DISPATCH</div>
+    <h2>Điều phối nghiên cứu đa tác tử DeepSeek</h2>
+    <p class="lead">Bộ Python cho phép chạy nhiều nhiệm vụ độc lập, tổng hợp kết quả và xuất dashboard HTML. Tham số <strong>--agents</strong> là giới hạn tác tử hoạt động đồng thời, không mặc định là số tác vụ thực tế của preset.</p>
+    <div class="formrow" style="margin-bottom:13px"><label for="preset">Chọn mẫu tác vụ:</label><select id="preset">
+      <option value="market_scan">Khảo sát thị trường · market_scan</option>
+      <option value="llm_model_intel">Phân tích mô hình LLM · llm_model_intel</option>
+      <option value="crypto_research">Nghiên cứu giao thức · crypto_research</option>
+      <option value="competitive_intel">Phân tích đối thủ · competitive_intel</option>
+      <option value="sec_audit_recon">Khảo sát an ninh · sec_audit_recon</option>
+      <option value="seo_research">Nghiên cứu SEO · seo_research</option>
+      <option value="tech_deep_dive">Nghiên cứu kỹ thuật · tech_deep_dive</option>
+      <option value="code_review">Rà soát mã · code_review</option>
+      <option value="domain_research">Nghiên cứu lĩnh vực · domain_research</option>
+    </select></div>
+    <div class="datagrid"><table><thead><tr><th>Đối tượng</th><th>Cách vận hành</th><th>Trạng thái demo</th></tr></thead><tbody>
+      <tr><td>Runner</td><td>Đọc tham số, preset, số tác tử và ngân sách</td><td><span class="rowtag yellow">MINH HỌA</span></td></tr>
+      <tr><td>Orchestrator</td><td>Điều phối tác vụ bất đồng bộ theo mức đồng thời</td><td><span class="rowtag yellow">MINH HỌA</span></td></tr>
+      <tr><td>DeepSeek API client</td><td>Gọi mô hình khi có API key và mạng</td><td><span class="rowtag">KHÔNG KẾT NỐI</span></td></tr>
+      <tr><td>Aggregator</td><td>Gom kết quả thành dashboard HTML</td><td><span class="rowtag yellow">MINH HỌA</span></td></tr>
+    </tbody></table></div>
+    <div class="cmd-card"><div class="cmd-head"><strong>CHẾ ĐỘ XEM TRƯỚC · KHÔNG TIÊU THỤ API</strong><button class="copy-btn">Sao chép</button></div><pre class="cmd-line"><code id="presetCommand">python3 runner.py --preset market_scan --topic "Vietnamese AI tools" --agents 20 --budget 5 --dry-run</code></pre></div>
+    <div class="notice good"><strong>Khuyến nghị:</strong> chạy <b>--dry-run</b> để quan sát kế hoạch trước khi chạy thực. Không nhập API key vào trang web này hoặc đưa key vào repository.</div>
+    <h3>Thực thi 100 tác vụ có khác 100 tác tử đồng thời?</h3>
+    <p>Khác nhau. Một tệp cấu hình có thể liệt kê nhiều pha và 100 tác vụ; nếu đặt <b>--agents 20</b>, tối đa 20 yêu cầu được thực thi đồng thời tùy thiết kế runner, tài nguyên và giới hạn nhà cung cấp. Kết quả thật cần được đối chứng; không nên mặc định tất cả tác tử đều đưa ra kết luận đúng.</p>
+  </article>
+
+  <article class="page" id="view-install" data-page="install" hidden>
+    <div class="overline">MODULE: SETUP.PRG / COMMAND WINDOW</div>
+    <h2>Cài đặt và chạy trên máy tính</h2>
+    <p class="lead">Mã nguồn bao gồm hai luồng: <strong>100x CLI</strong> dùng Bash + Claude Code, và <strong>DeepSeek Python pipeline</strong> dùng Python 3.9+ cùng thư viện <code>httpx</code>. Chọn đúng môi trường trước khi chạy.</p>
+    <h3>Phương án A · DeepSeek Python (Windows PowerShell)</h3>
+    <div class="cmd-card"><div class="cmd-head"><strong>01 / TẢI MÃ &amp; CÀI PHỤ THUỘC</strong><button class="copy-btn">Sao chép</button></div><pre class="cmd-line"><code>git clone https://github.com/xulytiengviet/auditor.git
+cd auditor
+python -m pip install httpx
+cd pipeline
+python runner.py --preset code_review --topic "Python code quality" --agents 5 --budget 5 --dry-run</code></pre></div>
+    <div class="cmd-card"><div class="cmd-head"><strong>02 / CHẠY THỰC SAU KHI CẤU HÌNH KEY</strong><button class="copy-btn">Sao chép</button></div><pre class="cmd-line"><code># Nhập khóa vào biến môi trường của phiên PowerShell
+$env:DEEPSEEK_API_KEY = "NHAP_KHOA_CUA_BAN"
+python runner.py --preset code_review --topic "Python code quality" --agents 5 --budget 5</code></pre></div>
+    <div class="notice">Lệnh thứ hai sẽ sử dụng API trả phí theo bảng giá hiện hành và chỉ nên chạy sau khi kiểm tra ngân sách. Không chia sẻ khóa thật, ảnh chụp terminal chứa khóa hoặc commit khóa vào Git.</div>
+    <hr>
+    <h3>Phương án B · 100x CLI (Linux / macOS / WSL2)</h3>
+    <div class="cmd-card"><div class="cmd-head"><strong>03 / MÔI TRƯỜNG BASH + CLAUDE CODE</strong><button class="copy-btn">Sao chép</button></div><pre class="cmd-line"><code>git clone https://github.com/xulytiengviet/auditor.git
+cd auditor
+# Yêu cầu: git, jq, bc và Claude Code CLI
+chmod +x 100x
+./100x doctor
+./100x init
+./100x gate</code></pre></div>
+    <div class="notice info">Trên Windows, dùng <b>WSL2</b> nếu muốn chạy trọn vẹn shell pipeline. Quy trình CLI có thể yêu cầu xác thực Claude Code; website không chạy thay các lệnh này.</div>
+    <h3>Nhóm lệnh chính</h3>
+    <div class="datagrid"><table><thead><tr><th>Lệnh</th><th>Công dụng</th></tr></thead><tbody>
+      <tr><td><code>100x doctor</code></td><td>Kiểm tra thành phần cần thiết</td></tr>
+      <tr><td><code>100x init</code></td><td>Khởi tạo quy tắc và hồ sơ dự án</td></tr>
+      <tr><td><code>100x run "..."</code></td><td>Chạy bốn bước phát triển</td></tr>
+      <tr><td><code>100x gate</code></td><td>Chạy cổng chất lượng</td></tr>
+      <tr><td><code>100x parallel "a" "b"</code></td><td>Xử lý nhiều nhiệm vụ bằng worktree</td></tr>
+      <tr><td><code>100x history</code></td><td>Xem lịch sử các lượt chạy</td></tr>
+      <tr><td><code>100x dashboard</code></td><td>Mở báo cáo dashboard mới nhất</td></tr>
+    </tbody></table></div>
+  </article>
+
+  <article class="page" id="view-docs" data-page="docs" hidden>
+    <div class="overline">MODULE: HELP.HLP / DOCUMENT BROWSER</div>
+    <h2>Tài liệu gốc &amp; nội dung Việt hóa</h2>
+    <p class="lead">Các liên kết dưới đây mở tệp thật trong repository. Bản mới chỉ đổi phần giao diện giải thích, không biến các báo cáo nghiên cứu thành số liệu đã được Auditor xác thực.</p>
+    <div class="linkgrid">
+      <a class="doclink" href="README.md" target="_blank" rel="noopener">README gốc (English) <span>↗</span></a>
+      <a class="doclink" href="README.vi.md" target="_blank" rel="noopener">Hướng dẫn tiếng Việt <span>↗</span></a>
+      <a class="doclink" href="landing-modern.html" target="_blank" rel="noopener">Trang giới thiệu cũ <span>↗</span></a>
+      <a class="doclink" href="autonomous-pipeline.html" target="_blank" rel="noopener">Mô tả Autonomous Pipeline <span>↗</span></a>
+      <a class="doclink" href="sc-audit-pipeline.html" target="_blank" rel="noopener">Sơ đồ Security Audit Pipeline <span>↗</span></a>
+      <a class="doclink" href="deployment-strategy.html" target="_blank" rel="noopener">Chiến lược triển khai <span>↗</span></a>
+      <a class="doclink" href="100x-Pipeline-Runbook.md" target="_blank" rel="noopener">Runbook và ví dụ <span>↗</span></a>
+      <a class="doclink" href="https://github.com/xulytiengviet/auditor/tree/main/pipeline" target="_blank" rel="noopener noreferrer">Thư mục pipeline/ <span>↗</span></a>
+    </div>
+    <hr>
+    <h3>Tra cứu nhanh tài liệu</h3><label for="findText" class="tiny">Nhập từ khóa để tìm mục hướng dẫn trên trang này:</label>
+    <input id="findText" class="searchbox" type="search" placeholder="Ví dụ: Python, bảo mật, tác tử, chất lượng..." autocomplete="off">
+    <div class="search-results" id="searchResults" aria-live="polite"></div>
+    <hr>
+    <h3>Giấy phép và nguồn gốc</h3>
+    <p>Dự án sử dụng giấy phép <strong>MIT</strong>; tệp LICENSE trong repository ghi nhận <strong>Copyright (c) 2026 theluckystrike</strong>. Nội dung và cấu trúc nguồn tham chiếu dự án <a href="https://github.com/theluckystrike/100xagenticdev" target="_blank" rel="noopener noreferrer">theluckystrike/100xagenticdev</a>. Giao diện tiếng Việt mang phong cách hoài cổ, không liên quan hay được Microsoft/Fox Software bảo trợ.</p>
+    <p class="footer-note">Nhãn Visual FoxPro ở đây mô tả phong cách UI: hệ cửa sổ, thanh menu, bảng dữ liệu, đường viền nổi và bảng Project Manager; không sử dụng hay phân phối trình biên dịch FoxPro.</p>
+    <div class="notice info">Bảo mật: mọi nút trong trang này chỉ điều hướng, sao chép lệnh hoặc chạy mô phỏng JavaScript cục bộ. Không thu thập dữ liệu, không lưu API key và không tuyên bố đã audit một hệ thống thật.</div>
+  </article>
   </div>
 </section>
-
-<!-- KEY INSIGHTS — BENTO GRID -->
-<section class="section section--alt" id="insights">
-  <div class="container">
-    <div class="section-label">Key Insights</div>
-    <h2 class="section-title">What this gives you as <span>a developer</span></h2>
-    <p class="section-desc">Eight compounding multipliers. Each works independently. Together they create a fundamentally different operating level.</p>
-
-    <div class="bento">
-      <!-- INSIGHT 1: Harness Engineering (wide) -->
-      <div class="bento-card bento-card--wide bento-card--featured reveal">
-        <div class="bento-icon bento-icon--purple">&#9881;</div>
-        <h3>The harness is the product, not the model</h3>
-        <p>Agent = Model + Harness. Changing only the wrapper around a fixed model improves performance by 6-10x on the same benchmark. Most agent failures are configuration problems, not model limitations. Stripe ships 1,300 AI-generated PRs/week with a heavily modified agent harness — zero model changes.</p>
-        <div class="bento-evidence">Hashline changed only the edit format: Grok Code Fast went from 6.7% to 68.3% — a 10x improvement with the exact same model, zero weight changes.</div>
-        <div><span class="bento-metric bento-metric--purple">6-10x from harness alone</span></div>
-      </div>
-
-      <!-- INSIGHT 2: Model Routing -->
-      <div class="bento-card reveal reveal-delay-1">
-        <div class="bento-big">85%</div>
-        <h3>Cost reduction via model routing</h3>
-        <p>Route simple queries to cheap models, complex to expensive. RouteLLM (ICLR 2025): only 26% of calls need the expensive model. 95% quality retained.</p>
-        <div><span class="bento-metric bento-metric--green">RouteLLM: 48-75% savings</span></div>
-      </div>
-
-      <!-- INSIGHT 3: Prompt Caching -->
-      <div class="bento-card reveal reveal-delay-2">
-        <div class="bento-big">90%</div>
-        <h3>Input savings from prompt caching</h3>
-        <p>Cache reads cost 10% of standard input on Anthropic. DeepSeek cache hits are 50x cheaper than misses. Hit rates go from 7% naive to 84% optimized.</p>
-        <div><span class="bento-metric bento-metric--green">ProjectDiscovery: 59% total cost cut</span></div>
-      </div>
-
-      <!-- INSIGHT 4: Quality Gates -->
-      <div class="bento-card reveal">
-        <div class="bento-icon bento-icon--green">&#9745;</div>
-        <h3>Zero-effort quality enforcement</h3>
-        <p>NASA Power of 10 rules enforced by ESLint. 7-stage fail-fast gate: Prettier, ESLint, tsc, Vitest, Semgrep, Gitleaks, npm audit. Claude Code hooks auto-format every edit and block writes to protected files. Quality becomes automatic.</p>
-        <div><span class="bento-metric bento-metric--green">7 gates, zero manual effort</span></div>
-      </div>
-
-      <!-- INSIGHT 5: Budget Safety (wide) -->
-      <div class="bento-card bento-card--wide reveal reveal-delay-1">
-        <div class="bento-icon bento-icon--pink">&#9888;</div>
-        <h3>Budget enforcement lives outside the agent</h3>
-        <p>90% of agent projects fail within 30 days — runaway costs are #1. Real incidents: $16-50K in 5 hours (recursion loop), $47K in 11 days (LangChain agent). The 5-layer budget system enforces limits at the gateway level. If the gateway enforces the budget before forwarding, the agent literally cannot make a violating call.</p>
-        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem">
-          <span class="bento-metric bento-metric--pink">Per-request ceiling</span>
-          <span class="bento-metric bento-metric--pink">Token circuit breaker</span>
-          <span class="bento-metric bento-metric--pink">Progress detection</span>
-          <span class="bento-metric bento-metric--pink">Session budget</span>
-          <span class="bento-metric bento-metric--pink">Daily spend limit</span>
-        </div>
-      </div>
-
-      <!-- INSIGHT 6: Memory Compounds -->
-      <div class="bento-card reveal reveal-delay-2">
-        <div class="bento-icon bento-icon--blue">&#9733;</div>
-        <h3>Memory compounds every session</h3>
-        <p>Karpathy's LLM Wiki: conversations flow into daily logs, compile into a wiki, inject into the next session. Creates a compounding brain, not a forgetful retriever. Every session makes the next one smarter.</p>
-        <div><span class="bento-metric bento-metric--blue">Knowledge grows, never resets</span></div>
-      </div>
-
-      <!-- INSIGHT 7: Generator != Reviewer -->
-      <div class="bento-card reveal reveal-delay-3">
-        <div class="bento-icon bento-icon--purple">&#8651;</div>
-        <h3>Generator never reviews itself</h3>
-        <p>The strongest pattern from production: the agent that writes code never reviews its own work. A separate reviewer catches blind spots. LLM-as-judge matches human agreement at 80% — and costs 500-5000x less.</p>
-        <div><span class="bento-metric bento-metric--purple">Separate write and review agents</span></div>
-      </div>
-
-      <!-- INSIGHT 8: Evals > Vibes -->
-      <div class="bento-card reveal reveal-delay-4">
-        <div class="bento-icon bento-icon--green">&#9878;</div>
-        <h3>Evals beat vibes</h3>
-        <p>Start with 20-50 tasks from real production failures. Use pass@k for capability, pass^k for reliability. Graduate capability evals into regression suites. If pass@1 < pass@3, add retries — the agent is capable but inconsistent.</p>
-        <div><span class="bento-metric bento-metric--green">Anthropic's eval framework</span></div>
-      </div>
+</main>
+<aside class="rightbar" aria-label="Bảng thông tin">
+  <section class="pane"><div class="pane-head">◈ PROPERTY INSPECTOR</div>
+    <div class="inspector-content">
+      <div class="metric"><span>Tên dự án</span><strong>auditor</strong></div>
+      <div class="metric"><span>Giao diện</span><strong>FOXPRO / VI</strong></div>
+      <div class="metric"><span>Engine chính</span><strong>100X + PYTHON</strong></div>
+      <div class="metric"><span>Trạng thái</span><strong><i class="light"></i> TÀI LIỆU</strong></div>
+      <div class="metric"><span>API</span><strong>CHƯA KẾT NỐI</strong></div>
+      <div class="metric"><span>Lượt mô phỏng</span><strong id="runCount">00</strong></div>
+      <div class="inspector-box"><strong>OBJECT INSPECTOR</strong><p style="margin:7px 0 0" id="objectDetail">Chọn một trang để xem mô tả chức năng và lệnh liên quan.</p></div>
     </div>
-  </div>
-</section>
-
-<!-- HOW THE PIPELINE WORKS -->
-<section class="section" id="pipeline">
-  <div class="container">
-    <div class="section-label">Pipeline</div>
-    <h2 class="section-title">5 stages, fully <span>autonomous</span></h2>
-    <p class="section-desc">Every task flows through 5 stages. Budget tracked at every step. Circuit breakers halt runaway agents. Quality gates block bad code automatically.</p>
-
-    <div class="pipeline reveal">
-      <div class="pipe-step">
-        <div class="pipe-dot">1</div>
-        <h4>Analyze</h4>
-        <p>Understand codebase, identify files, create plan</p>
-        <div class="pipe-model">Opus</div>
-      </div>
-      <div class="pipe-step">
-        <div class="pipe-dot">2</div>
-        <h4>Implement</h4>
-        <p>Execute plan, write code, handle dependencies</p>
-        <div class="pipe-model">Sonnet</div>
-      </div>
-      <div class="pipe-step">
-        <div class="pipe-dot">3</div>
-        <h4>Test</h4>
-        <p>Run tests, fix failures, add coverage</p>
-        <div class="pipe-model">Haiku</div>
-      </div>
-      <div class="pipe-step">
-        <div class="pipe-dot">4</div>
-        <h4>Review</h4>
-        <p>Security scan, quality check, LLM-as-judge</p>
-        <div class="pipe-model">Opus</div>
-      </div>
-      <div class="pipe-step">
-        <div class="pipe-dot">5</div>
-        <h4>Ship</h4>
-        <p>Commit, create PR, deploy</p>
-        <div class="pipe-model">Haiku</div>
-      </div>
+  </section>
+  <section class="pane"><div class="pane-head">⌨ PHÍM TẮT / BẢN ĐỒ</div>
+    <div class="inspector-content">
+      <div class="key-row"><span>Trợ giúp</span><kbd>F1</kbd></div>
+      <div class="key-row"><span>Chạy mô phỏng</span><kbd>F5</kbd></div>
+      <div class="key-row"><span>Quay về tổng quan</span><kbd>Esc</kbd></div>
+      <div class="key-row"><span>Mở cài đặt</span><kbd>Alt + I</kbd></div>
+      <p class="tiny muted" style="margin-top:13px">Đây là trải nghiệm mô phỏng dành cho người học và kỹ sư. Kết quả demo không phải báo cáo kiểm toán.</p>
+      <a class="retro-btn" style="width:100%;margin-top:5px" href="https://github.com/xulytiengviet/auditor" target="_blank" rel="noopener noreferrer">↗ Repository</a>
     </div>
-
-    <!-- ARCHITECTURE -->
-    <div class="arch reveal">
-      <pre>
-  ORCHESTRATOR    Shell scripts  ·  Cron  ·  GitHub Actions  ·  Routines
-  ─────────────────────────────────────────────────────────────────────
-  AGENT LAYER     PLAN (Opus)  ·  CODE (Sonnet)  ·  REVIEW (Opus)  ·  TEST (Haiku)
-  ─────────────────────────────────────────────────────────────────────
-  MCP SERVERS     Memory  ·  GitHub  ·  Search  ·  Browser  ·  Context7
-  ─────────────────────────────────────────────────────────────────────
-  QUALITY GATES   Prettier → ESLint → tsc → Vitest → Semgrep → Gitleaks
-  ─────────────────────────────────────────────────────────────────────
-  COST CONTROL    Model routing  ·  Prompt caching  ·  Token budgets
-  ─────────────────────────────────────────────────────────────────────
-  MEMORY          Conversations → Daily Logs → Compiled Wiki → Next Session</pre>
-    </div>
-  </div>
-</section>
-
-<!-- KARPATHY'S RULES -->
-<section class="section section--alt">
-  <div class="container">
-    <div class="section-label">Foundation</div>
-    <h2 class="section-title">Karpathy's 4 rules <span>for agentic code</span></h2>
-    <p class="section-desc">From the 126K+ starred CLAUDE.md that started the agentic engineering movement. The operating system for how agents should write code.</p>
-
-    <div class="rules-grid">
-      <div class="rule reveal">
-        <div class="rule-number">01</div>
-        <h4>Think Before Coding</h4>
-        <p>Don't assume. Don't hide confusion. Surface tradeoffs. If multiple interpretations exist, present them — don't pick silently.</p>
-        <blockquote>If something is unclear, stop. Name what's confusing. Ask.</blockquote>
-      </div>
-      <div class="rule reveal reveal-delay-1">
-        <div class="rule-number">02</div>
-        <h4>Simplicity First</h4>
-        <p>Minimum code that solves the problem. Nothing speculative. No abstractions for single-use code. If 200 lines could be 50, rewrite it.</p>
-        <blockquote>Would a senior engineer say this is overcomplicated? If yes, simplify.</blockquote>
-      </div>
-      <div class="rule reveal reveal-delay-2">
-        <div class="rule-number">03</div>
-        <h4>Surgical Changes</h4>
-        <p>Touch only what you must. Clean up only your own mess. Every changed line should trace directly to the user's request.</p>
-        <blockquote>Don't "improve" adjacent code. Match existing style, even if you'd do it differently.</blockquote>
-      </div>
-      <div class="rule reveal reveal-delay-3">
-        <div class="rule-number">04</div>
-        <h4>Goal-Driven Execution</h4>
-        <p>Define success criteria. Loop until verified. Transform tasks into verifiable goals, then loop independently until they pass.</p>
-        <blockquote>Strong success criteria let you loop independently. Weak criteria require constant clarification.</blockquote>
-      </div>
-    </div>
-
-    <div class="quote-block reveal">
-      <blockquote>People who are very good at this can peak much higher than 10x. Vibe coding raises the floor. Agentic engineering extrapolates the ceiling.</blockquote>
-      <cite>— Andrej Karpathy, Sequoia AI Ascent 2026</cite>
-    </div>
-  </div>
-</section>
-
-<!-- COST COMPARISON -->
-<section class="section" id="costs">
-  <div class="container">
-    <div class="section-label">Economics</div>
-    <h2 class="section-title">Route smart, <span>pay less</span></h2>
-    <p class="section-desc">Not every task needs a frontier model. Route by complexity. DeepSeek V4 Flash trails Opus by 1.8 SWE-bench points but costs 35-100x less.</p>
-
-    <div class="cost-wrap reveal">
-      <table class="cost-table">
-        <thead>
-          <tr>
-            <th>Model</th>
-            <th>Input / 1M</th>
-            <th>Output / 1M</th>
-            <th>SWE-bench</th>
-            <th>vs Frontier</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Claude Opus 4</strong></td>
-            <td>$15.00</td>
-            <td>$75.00</td>
-            <td>72.5%</td>
-            <td>Baseline</td>
-          </tr>
-          <tr>
-            <td><strong>Claude Sonnet 4</strong></td>
-            <td>$3.00</td>
-            <td>$15.00</td>
-            <td>72.7%</td>
-            <td><span class="cost-savings">5x cheaper</span></td>
-          </tr>
-          <tr>
-            <td><strong>DeepSeek V4 Pro</strong> <span class="cost-promo">75% OFF</span></td>
-            <td class="cost-green">$0.44</td>
-            <td class="cost-green">$0.87</td>
-            <td>80.6%</td>
-            <td><span class="cost-savings">~7x cheaper</span></td>
-          </tr>
-          <tr>
-            <td><strong>DeepSeek V4 Flash</strong></td>
-            <td class="cost-green">$0.14</td>
-            <td class="cost-green">$0.28</td>
-            <td>~79%</td>
-            <td><span class="cost-savings">35-100x cheaper</span></td>
-          </tr>
-          <tr>
-            <td><strong>DS V4 Pro</strong> (cache hit)</td>
-            <td class="cost-green">$0.004</td>
-            <td>—</td>
-            <td>—</td>
-            <td><span class="cost-savings">~1,400x cheaper</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:2rem" class="reveal">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center">
-        <div style="font-size:2.2rem;font-weight:800;color:var(--accent2)">$0.28</div>
-        <div style="font-size:0.8rem;color:var(--text3);margin-top:0.25rem">per 1M output tokens<br>DeepSeek V4 Flash</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center">
-        <div style="font-size:2.2rem;font-weight:800;color:var(--accent2)">50x</div>
-        <div style="font-size:0.8rem;color:var(--text3);margin-top:0.25rem">cheaper cache hits<br>vs cache misses</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center">
-        <div style="font-size:2.2rem;font-weight:800;color:var(--accent2)">26%</div>
-        <div style="font-size:0.8rem;color:var(--text3);margin-top:0.25rem">calls need expensive model<br>RouteLLM (ICLR 2025)</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- THE FORMULA -->
-<section class="section section--alt">
-  <div class="container" style="text-align:center">
-    <div class="section-label">The Compound Effect</div>
-    <h2 class="section-title">The <span>100x formula</span></h2>
-    <p class="section-desc" style="margin:0 auto 2rem">Each multiplier compounds. Miss one, you're still 10x. Stack all seven, you operate at a fundamentally different level.</p>
-    <div class="formula-box reveal">
-      <div class="formula-code">
-        <span class="var">100x</span> <span class="op">=</span> CLAUDE.md rules<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="op">+</span> Harness engineering &nbsp;&nbsp;&nbsp;<span class="comment">// 6-10x on same model</span><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="op">+</span> Model routing &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// 75-85% cost reduction</span><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="op">+</span> Prompt caching &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// 90% input savings</span><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="op">+</span> Eval loops &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// quality maintenance</span><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="op">+</span> Loop budgets &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// prevents $47K incidents</span><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="op">+</span> Multi-agent &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// parallel execution</span><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="op">+</span> Memory system &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// compounding knowledge</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- GET STARTED -->
-<section class="section" id="start">
-  <div class="container">
-    <div class="section-label">Onboarding</div>
-    <h2 class="section-title">Get started in <span>15 minutes</span></h2>
-    <p class="section-desc">Incremental adoption. Each step works independently. No all-or-nothing commitment. Add a layer when you're ready.</p>
-
-    <div class="steps">
-      <div class="step reveal">
-        <div class="step-num">1</div>
-        <div class="step-content">
-          <h4>Clone the pipeline</h4>
-          <p>All configs, scripts, and research in one repo.</p>
-          <div class="step-code">git clone https://github.com/theluckystrike/100xagenticdev.git<br>cd 100xagenticdev</div>
-        </div>
-      </div>
-      <div class="step reveal reveal-delay-1">
-        <div class="step-num">2</div>
-        <div class="step-content">
-          <h4>Copy CLAUDE.md to your project</h4>
-          <p>Adapt the rules to your codebase. Keep under 150 lines. Add project-specific patterns.</p>
-          <div class="step-code">cp CLAUDE.md ~/your-project/CLAUDE.md</div>
-        </div>
-      </div>
-      <div class="step reveal reveal-delay-2">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <h4>Install MCP servers</h4>
-          <p>Expand Claude's capabilities: memory, search, browser, GitHub, docs.</p>
-          <div class="step-code">bash config/mcp-setup.sh<br>claude mcp list &nbsp;# verify</div>
-        </div>
-      </div>
-      <div class="step reveal reveal-delay-3">
-        <div class="step-num">4</div>
-        <div class="step-content">
-          <h4>Enable hooks &amp; quality gates</h4>
-          <p>Auto-format on every edit. Block edits to .env files. Restore context after compaction.</p>
-          <div class="step-code">cp config/hooks-settings.json ~/.claude/settings.json</div>
-        </div>
-      </div>
-      <div class="step reveal reveal-delay-4">
-        <div class="step-num">5</div>
-        <div class="step-content">
-          <h4>Run your first autonomous pipeline</h4>
-          <p>4-stage pipeline: Analyze, Implement, Test, Review. Budget-tracked and JSON-logged.</p>
-          <div class="step-code">cd ~/your-project<br>bash ~/100xagenticdev/scripts/pipeline.sh "Add input validation to all API endpoints"</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- WHAT'S INCLUDED -->
-<section class="section section--alt">
-  <div class="container">
-    <div class="section-label">Included</div>
-    <h2 class="section-title">Everything in <span>one repo</span></h2>
-
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.25rem;margin-top:3rem" class="reveal">
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem">
-        <div style="font-size:0.8rem;font-weight:700;color:var(--accent);margin-bottom:0.75rem;font-family:'SF Mono',monospace">CLAUDE.md</div>
-        <div style="font-size:0.92rem;color:var(--text2)">Project instructions template with NASA Power of 10 rules. Copy to any project and adapt.</div>
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem">
-        <div style="font-size:0.8rem;font-weight:700;color:var(--accent);margin-bottom:0.75rem;font-family:'SF Mono',monospace">config/hooks-settings.json</div>
-        <div style="font-size:0.92rem;color:var(--text2)">Claude Code hooks: auto-lint on edit, block secrets, protect files, restore context after compaction.</div>
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem">
-        <div style="font-size:0.8rem;font-weight:700;color:var(--accent);margin-bottom:0.75rem;font-family:'SF Mono',monospace">config/nasa-p10-eslint.config.mjs</div>
-        <div style="font-size:0.92rem;color:var(--text2)">ESLint rules enforcing NASA Power of 10: 60-line functions, bounded loops, no global state.</div>
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem">
-        <div style="font-size:0.8rem;font-weight:700;color:var(--accent);margin-bottom:0.75rem;font-family:'SF Mono',monospace">scripts/pipeline.sh</div>
-        <div style="font-size:0.92rem;color:var(--text2)">4-stage autonomous pipeline with budget tracking, cost logging, and JSON output.</div>
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem">
-        <div style="font-size:0.8rem;font-weight:700;color:var(--accent);margin-bottom:0.75rem;font-family:'SF Mono',monospace">scripts/parallel-agents.sh</div>
-        <div style="font-size:0.92rem;color:var(--text2)">Spawn N Claude instances on isolated git worktrees. Parallel execution with auto-commit.</div>
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem">
-        <div style="font-size:0.8rem;font-weight:700;color:var(--accent);margin-bottom:0.75rem;font-family:'SF Mono',monospace">scripts/quality-gate.sh</div>
-        <div style="font-size:0.92rem;color:var(--text2)">7-stage fail-fast: Prettier, ESLint, tsc, Vitest, Semgrep, Gitleaks, npm audit.</div>
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem">
-        <div style="font-size:0.8rem;font-weight:700;color:var(--accent);margin-bottom:0.75rem;font-family:'SF Mono',monospace">config/mcp-setup.sh</div>
-        <div style="font-size:0.92rem;color:var(--text2)">One-command MCP server installer: Memory, Sequential Thinking, Context7, Playwright, Fetch.</div>
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem">
-        <div style="font-size:0.8rem;font-weight:700;color:var(--accent);margin-bottom:0.75rem;font-family:'SF Mono',monospace">research/</div>
-        <div style="font-size:0.92rem;color:var(--text2)">Definitive Karpathy study (63 repos), deep 1000x developer report (20 sections, 150+ sources).</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ADOPTION PATH -->
-<section class="section">
-  <div class="container" style="text-align:center">
-    <div class="section-label">Adoption</div>
-    <h2 class="section-title">Grow at <span>your pace</span></h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;margin-top:3rem;max-width:900px;margin-left:auto;margin-right:auto" class="reveal">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.25rem 0.75rem;text-align:center">
-        <div style="font-size:0.7rem;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Week 1</div>
-        <div style="font-size:0.88rem;font-weight:600;margin-top:0.4rem">CLAUDE.md</div>
-        <div style="font-size:0.75rem;color:var(--text3);margin-top:0.25rem">2-3x accuracy</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.25rem 0.75rem;text-align:center">
-        <div style="font-size:0.7rem;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Week 2</div>
-        <div style="font-size:0.88rem;font-weight:600;margin-top:0.4rem">MCP Servers</div>
-        <div style="font-size:0.75rem;color:var(--text3);margin-top:0.25rem">Expanded reach</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.25rem 0.75rem;text-align:center">
-        <div style="font-size:0.7rem;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Week 3</div>
-        <div style="font-size:0.88rem;font-weight:600;margin-top:0.4rem">Hooks</div>
-        <div style="font-size:0.75rem;color:var(--text3);margin-top:0.25rem">Auto quality</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.25rem 0.75rem;text-align:center">
-        <div style="font-size:0.7rem;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Week 4</div>
-        <div style="font-size:0.88rem;font-weight:600;margin-top:0.4rem">CI/CD</div>
-        <div style="font-size:0.75rem;color:var(--text3);margin-top:0.25rem">Auto PR review</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.25rem 0.75rem;text-align:center">
-        <div style="font-size:0.7rem;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Week 5</div>
-        <div style="font-size:0.88rem;font-weight:600;margin-top:0.4rem">Pipeline</div>
-        <div style="font-size:0.75rem;color:var(--text3);margin-top:0.25rem">Autonomous tasks</div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.25rem 0.75rem;text-align:center">
-        <div style="font-size:0.7rem;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Week 6</div>
-        <div style="font-size:0.88rem;font-weight:600;margin-top:0.4rem">Multi-Agent</div>
-        <div style="font-size:0.75rem;color:var(--text3);margin-top:0.25rem">Parallel work</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SOURCES -->
-<section class="section section--alt">
-  <div class="container" style="text-align:center">
-    <div class="section-label">Based On</div>
-    <h2 class="section-title" style="font-size:1.5rem">Built on <span>real research</span>, not hype</h2>
-    <div style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;margin-top:2rem">
-      <a href="https://karpathy.bearblog.dev/sequoia-ascent-2026/" style="padding:10px 18px;background:var(--surface);border:1px solid var(--border);border-radius:100px;font-size:0.82rem;color:var(--text2);transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">Karpathy Sequoia 2026</a>
-      <a href="https://github.com/forrestchang/andrej-karpathy-skills" style="padding:10px 18px;background:var(--surface);border:1px solid var(--border);border-radius:100px;font-size:0.82rem;color:var(--text2);transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">CLAUDE.md 126K stars</a>
-      <a href="https://www.lmsys.org/blog/2024-07-01-routellm/" style="padding:10px 18px;background:var(--surface);border:1px solid var(--border);border-radius:100px;font-size:0.82rem;color:var(--text2);transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">RouteLLM (ICLR 2025)</a>
-      <a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents" style="padding:10px 18px;background:var(--surface);border:1px solid var(--border);border-radius:100px;font-size:0.82rem;color:var(--text2);transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">Anthropic Evals Guide</a>
-      <a href="https://martinfowler.com/articles/harness-engineering.html" style="padding:10px 18px;background:var(--surface);border:1px solid var(--border);border-radius:100px;font-size:0.82rem;color:var(--text2);transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">Martin Fowler: Harness Eng.</a>
-      <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching" style="padding:10px 18px;background:var(--surface);border:1px solid var(--border);border-radius:100px;font-size:0.82rem;color:var(--text2);transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">Anthropic Prompt Caching</a>
-    </div>
-    <p style="margin-top:2rem;font-size:0.82rem;color:var(--text3)">150+ sources researched. All claims sourced. Unverified claims explicitly flagged.</p>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="container">
-    <p class="footer-tagline">"You can outsource your thinking, but you can't outsource your understanding."</p>
-    <p style="font-size:0.82rem;color:var(--text3)">— Andrej Karpathy</p>
-    <div class="footer-links">
-      <a href="https://github.com/theluckystrike/100xagenticdev">GitHub</a>
-      <a href="https://karpathy.bearblog.dev/sequoia-ascent-2026/">Karpathy's Talk</a>
-      <a href="https://x.com/karpathy/status/1937902205765607626">Context Engineering</a>
-    </div>
-    <p class="footer-copy">Built with Claude Code. Researched from 150+ sources across academic papers, production case studies, and official documentation.</p>
-  </div>
+  </section>
+</aside>
+</div>
+<footer class="statusbar">
+  <span><i class="light" aria-hidden="true"></i><span id="statusText">SẴN SÀNG — HỒ SƠ ĐÃ TẢI</span></span>
+  <span id="recordStatus">MỤC 01 / 06</span>
+  <span>UTF-8 · VI-VN</span>
+  <span>DEMO LOCAL · KHÔNG KẾT NỐI API</span>
 </footer>
-
-<!-- SCRIPTS -->
+</div>
+</div>
 <script>
-// Nav scroll effect
-const nav = document.getElementById('nav');
-window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 50);
+(function(){
+"use strict";
+var viewIds=["home","pipeline","quality","agents","install","docs"];
+var pageTitles={home:"Giới thiệu dự án",pipeline:"Quy trình bốn giai đoạn",quality:"Kiểm thử & bảo mật",agents:"Điều phối tác tử",install:"Cài đặt công cụ",docs:"Tài liệu tham khảo"};
+var descriptions={home:"Giới thiệu hai luồng thực thi: CLI phát triển phần mềm và DeepSeek nghiên cứu.",pipeline:"Bốn bước Analyze → Implement → Test → Review; chạy thử chỉ là mô phỏng.",quality:"Quality gate lựa chọn công cụ theo stack; không báo PASS nếu chưa chạy thật.",agents:"Tác tử bất đồng bộ, preset nghiên cứu và ngân sách; không kết nối API tại trang.",install:"Các lệnh tham khảo cho PowerShell và Linux/macOS/WSL2.",docs:"Liên kết tài liệu gốc, giấy phép MIT và tìm kiếm nhanh."};
+var count=0,timer=null,completed=0;
+function show(id){
+ if(viewIds.indexOf(id)<0)return;
+ document.querySelectorAll("[data-page]").forEach(function(el){var yes=el.dataset.page===id;el.classList.toggle("active",yes);el.hidden=!yes;});
+ document.querySelectorAll(".nav-item").forEach(function(el){var yes=el.dataset.nav===id;el.classList.toggle("active",yes);if(yes)el.setAttribute("aria-current","page");else el.removeAttribute("aria-current");});
+ document.querySelectorAll(".tab").forEach(function(el){el.setAttribute("aria-selected",el.dataset.nav===id?"true":"false");});
+ document.getElementById("recordStatus").textContent="MỤC "+String(viewIds.indexOf(id)+1).padStart(2,"0")+" / 06";
+ document.getElementById("statusText").textContent=pageTitles[id].toUpperCase()+" — SẴN SÀNG";
+ document.getElementById("objectDetail").textContent=descriptions[id];
+ document.getElementById("explorer").classList.remove("show-mobile");
+ document.getElementById("toggleExplorer").setAttribute("aria-expanded","false");
+ window.location.hash=id;
+}
+document.querySelectorAll("[data-nav]").forEach(function(el){el.addEventListener("click",function(){show(el.dataset.nav);});});
+function printLine(value){
+ var box=document.getElementById("demoConsole");
+ box.appendChild(document.createTextNode("\n"+value));
+ box.scrollTop=box.scrollHeight;
+}
+function paint(value){
+ document.querySelectorAll("[data-stage]").forEach(function(el){
+ var n=Number(el.dataset.stage);el.classList.toggle("done",n<value);el.classList.toggle("current",n===value&&value<4);
+ });
+ var p=Math.min(value*25,100);document.getElementById("progressFill").style.width=p+"%";
+ document.getElementById("progress").setAttribute("aria-valuenow",String(p));
+}
+function reset(){
+ if(timer!==null){clearInterval(timer);timer=null;}
+ completed=0;paint(0);
+ document.getElementById("demoState").textContent="Sẵn sàng · Chưa chạy";
+ document.getElementById("runDemo").disabled=false;
+ document.getElementById("demoConsole").textContent="C:\\AUDITOR> Chờ lệnh RUN DEMO\n* Đây là console mô phỏng, không phải kết quả kiểm tra thực tế.";
+}
+function run(){
+ show("pipeline");if(timer!==null)return;reset();
+ count+=1;document.getElementById("runCount").textContent=String(count).padStart(2,"0");
+ document.getElementById("runDemo").disabled=true;
+ document.getElementById("demoState").textContent="Đang mô phỏng 01/04";
+ printLine("[DEMO] Khởi động luồng nội bộ; không gọi API, không đọc mã.");
+ var logs=[
+ "[01/04] ANALYZE — Xác định yêu cầu, phạm vi và các rủi ro.",
+ "[02/04] IMPLEMENT — Minh họa thay đổi mã theo kế hoạch.",
+ "[03/04] TEST — Minh họa việc gọi quality gates, chưa chạy công cụ.",
+ "[04/04] REVIEW — Minh họa đối chiếu checklist và tổng hợp báo cáo."
+ ];
+ timer=setInterval(function(){
+ printLine(logs[completed]);completed+=1;paint(completed);
+ document.getElementById("demoState").textContent="Đang mô phỏng "+String(Math.min(completed+1,4)).padStart(2,"0")+"/04";
+ if(completed===4){
+ clearInterval(timer);timer=null;
+ document.getElementById("runDemo").disabled=false;
+ document.getElementById("demoState").textContent="Hoàn thành mô phỏng 04/04 · KHÔNG PHẢI PASS";
+ printLine("[END] Đã hoàn tất minh họa. Không có kiểm toán thực tế.");
+ document.getElementById("statusText").textContent="DEMO HOÀN THÀNH — KHÔNG CÓ KẾT QUẢ AUDIT";
+ }
+ },950);
+}
+document.getElementById("runDemo").addEventListener("click",run);
+document.getElementById("toolbarDemo").addEventListener("click",run);
+document.getElementById("resetDemo").addEventListener("click",reset);
+document.querySelectorAll(".copy-btn").forEach(function(btn){
+ btn.addEventListener("click",function(){
+ var node=btn.closest(".cmd-card").querySelector("code");
+ var value=node.textContent;
+ var feedback=function(){btn.textContent="Đã sao chép";setTimeout(function(){btn.textContent="Sao chép";},1400);};
+ if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(value).then(feedback).catch(function(){fallback(value,feedback);});}
+ else fallback(value,feedback);
+ });
 });
-
-// Intersection Observer for reveal animations
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-    }
-  });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+function fallback(value,done){
+ var ta=document.createElement("textarea");ta.value=value;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();
+ try{if(document.execCommand("copy"))done();else window.prompt("Sao chép lệnh:",value);}catch(e){window.prompt("Sao chép lệnh:",value);}
+ ta.remove();
+}
+var preset=document.getElementById("preset");
+preset.addEventListener("change",function(){
+ document.getElementById("presetCommand").textContent='python3 runner.py --preset '+preset.value+' --topic "Vietnamese AI tools" --agents 20 --budget 5 --dry-run';
+});
+document.getElementById("exportBtn").addEventListener("click",function(){
+ var report=["AUDITOR 100X - NHAT KY MO PHONG","Ngay tao: "+new Date().toLocaleString("vi-VN"),"So luot demo: "+count,"Che do: JavaScript local - KHONG THUC THI AUDIT","",document.getElementById("demoConsole").textContent,"","Nguon: https://github.com/xulytiengviet/auditor"].join("\n");
+ var blob=new Blob(["\uFEFF"+report],{type:"text/plain;charset=utf-8"});var u=URL.createObjectURL(blob);var a=document.createElement("a");a.href=u;a.download="auditor-100x-demo-log.txt";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},1000);
+ document.getElementById("statusText").textContent="ĐÃ XUẤT NHẬT KÝ MÔ PHỎNG";
+});
+document.getElementById("toggleExplorer").addEventListener("click",function(){
+ var el=document.getElementById("explorer");var opened=el.classList.toggle("show-mobile");document.getElementById("toggleExplorer").setAttribute("aria-expanded",String(opened));
+});
+var pagesSearch=[
+ ["home","Giới thiệu","tổng quan auditor 100x là gì AI mô phỏng cli"],
+ ["pipeline","Quy trình","analyze implement test review bốn giai đoạn"],
+ ["quality","Cổng chất lượng","bảo mật semgrep gitleaks nasa power 10 gate kiểm thử rust python"],
+ ["agents","Đa tác tử","deepseek agent preset thị trường nghiên cứu ngân sách"],
+ ["install","Cài đặt","windows powershell linux macos wsl2 python git claude"],
+ ["docs","Tài liệu","readme giấy phép nguồn gốc foxpro"]
+];
+var search=document.getElementById("findText");
+search.addEventListener("input",function(){
+ var q=search.value.trim().toLocaleLowerCase("vi");var list=document.getElementById("searchResults");list.replaceChildren();if(!q)return;
+ var matches=pagesSearch.filter(function(p){return(p[1]+" "+p[2]).toLocaleLowerCase("vi").includes(q);});
+ if(!matches.length){list.textContent="Chưa có mục phù hợp. Hãy thử từ khóa khác.";return;}
+ matches.forEach(function(p){var b=document.createElement("button");b.className="search-hit";b.textContent="▣ "+p[1]+" — mở trang";b.addEventListener("click",function(){show(p[0]);});list.appendChild(b);});
+});
+document.addEventListener("keydown",function(e){
+ var typing=e.target&&(e.target.matches("input,textarea,select")||e.target.isContentEditable);
+ if(e.key==="F1"){e.preventDefault();show("docs");}
+ else if(e.key==="F5"){e.preventDefault();run();}
+ else if(e.key==="Escape"&&!typing){show("home");}
+ else if(e.altKey&&e.key.toLowerCase()==="i"){e.preventDefault();show("install");}
+});
+window.addEventListener("hashchange",function(){var id=location.hash.slice(1);if(viewIds.includes(id))show(id);});
+var initial=location.hash.slice(1);if(viewIds.includes(initial))show(initial);else show("home");
+})();
 </script>
-
 </body>
 </html>
