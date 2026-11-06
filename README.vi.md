@@ -6,10 +6,10 @@ Trang chủ tiếng Việt: [Giao diện Visual FoxPro](https://xulytiengviet.gi
 
 ## 1. Dự án làm gì?
 
-Repository \`xulytiengviet/auditor\` chứa mã và báo cáo về **100x Agentic Engineer Pipeline**. Có hai phương án sử dụng:
+Repository `xulytiengviet/auditor` chứa mã và báo cáo về **100x Agentic Engineer Pipeline**. Có hai phương án sử dụng:
 
 1. **100x CLI** — kết hợp Claude Code và một harness, gồm **Phân tích → Triển khai → Kiểm thử → Rà soát**.
-2. **DeepSeek multi-agent Python** — chạy các tác vụ nghiên cứu được cấu hình sẵn hoặc tệp JSON; giới hạn số tác vụ đồng thời bằng \`--agents\`.
+2. **DeepSeek multi-agent Python** — chạy các tác vụ nghiên cứu được cấu hình sẵn hoặc tệp JSON; giới hạn số tác vụ đồng thời bằng `--agents`.
 
 Tên “auditor” ở đây không có nghĩa GitHub Pages là công cụ quét website trực tiếp.
 
@@ -46,7 +46,7 @@ Không đưa khóa thật vào mã nguồn, commit hoặc website. Chạy thật
 
 ## 4. Chạy 100x CLI với Bash
 
-Khuyến nghị Linux/macOS hoặc WSL2 trên Windows. CLI yêu cầu thêm các chương trình hệ thống, trong đó có Claude Code CLI, \`jq\`, \`git\` và \`bc\`.
+Khuyến nghị Linux/macOS hoặc WSL2 trên Windows. CLI yêu cầu thêm các chương trình hệ thống, trong đó có Claude Code CLI, `jq`, `git` và `bc`.
 
 ~~~bash
 git clone https://github.com/xulytiengviet/auditor.git
@@ -57,7 +57,7 @@ chmod +x 100x
 ./100x gate
 ~~~
 
-Để chạy luồng bốn bước, trong thư mục dự án mục tiêu sau khi có thể gọi lệnh \`100x\`, dùng:
+Để chạy luồng bốn bước, trong thư mục dự án mục tiêu sau khi có thể gọi lệnh `100x`, dùng:
 
 ~~~bash
 100x run "Add input validation to all API endpoints"
@@ -85,6 +85,6 @@ Các bước chỉ hoạt động nếu dependencies và cấu hình thực tế
 
 ## 7. Ghi nhận nguồn
 
-Tệp [LICENSE](LICENSE) của repository sử dụng giấy phép **MIT**, ghi \`Copyright (c) 2026 theluckystrike\`. Mã gốc tham chiếu [theluckystrike/100xagenticdev](https://github.com/theluckystrike/100xagenticdev).
+Tệp [LICENSE](LICENSE) của repository sử dụng giấy phép **MIT**, ghi `Copyright (c) 2026 theluckystrike`. Mã gốc tham chiếu [theluckystrike/100xagenticdev](https://github.com/theluckystrike/100xagenticdev).
 
 Giao diện chỉ lấy cảm hứng thị giác từ **Visual FoxPro / Windows 9x**; không chứa trình biên dịch FoxPro và không đại diện cho thương hiệu hay sản phẩm chính thức của Microsoft.
